@@ -90,7 +90,7 @@ var node;
                         browser = _b.sent();
                         _b.label = 2;
                     case 2:
-                        _b.trys.push([2, , 8, 10]);
+                        _b.trys.push([2, , 7, 9]);
                         console.log('mainPage...');
                         return [4 /*yield*/, browser.pages()];
                     case 3:
@@ -102,21 +102,17 @@ var node;
                         _b.label = 5;
                     case 5:
                         mainPage = _a;
-                        console.log('setContent...');
-                        return [4 /*yield*/, mainPage.setContent('<html><head><title>Map Tile Scraper</title></head><body></body></html>')];
+                        return [4 /*yield*/, withBrowser(browser, mainPage)];
                     case 6:
                         _b.sent();
-                        return [4 /*yield*/, withBrowser(browser, mainPage)];
+                        return [3 /*break*/, 9];
                     case 7:
-                        _b.sent();
-                        return [3 /*break*/, 10];
-                    case 8:
                         console.log('close...');
                         return [4 /*yield*/, browser.close()];
-                    case 9:
+                    case 8:
                         _b.sent();
                         return [7 /*endfinally*/];
-                    case 10: return [2 /*return*/];
+                    case 9: return [2 /*return*/];
                 }
             });
         });
@@ -124,9 +120,65 @@ var node;
     node.main = main;
     function withBrowser(browser, mainPage) {
         return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                return [2 /*return*/];
+            var navigate, _a, width, height;
+            var _this = this;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        navigate = (function () { return __awaiter(_this, void 0, void 0, function () {
+                            var error_1;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0:
+                                        _a.trys.push([0, 2, , 3]);
+                                        return [4 /*yield*/, mainPage.goto('http://maps.google.com/')];
+                                    case 1:
+                                        _a.sent();
+                                        return [3 /*break*/, 3];
+                                    case 2:
+                                        error_1 = _a.sent();
+                                        return [2 /*return*/, error_1];
+                                    case 3: return [2 /*return*/];
+                                }
+                            });
+                        }); })();
+                        return [4 /*yield*/, prompt('Navigate to the place and press ENTER')];
+                    case 1:
+                        _b.sent();
+                        return [4 /*yield*/, mainPage.evaluate('[window.innerWidth, window.innerHeight]')];
+                    case 2:
+                        _a = _b.sent(), width = _a[0], height = _a[1];
+                        console.log({ width: width, height: height });
+                        return [4 /*yield*/, prompt('exit')];
+                    case 3:
+                        _b.sent();
+                        return [2 /*return*/];
+                }
             });
+        });
+    }
+    function prompt(message) {
+        return new Promise(function (resolve, reject) {
+            if (message)
+                process.stdout.write(message);
+            process.stdin.on('data', onData);
+            process.stdin.on('error', onError);
+            var buf = '';
+            function onData(dt) {
+                buf += dt.toString();
+                if (/\n/.test(buf)) {
+                    unsubscribe();
+                    resolve(buf);
+                }
+            }
+            function onError(error) {
+                unsubscribe();
+                reject(error);
+            }
+            function unsubscribe() {
+                process.stdin.off('data', onData);
+                process.stdin.off('error', onError);
+            }
         });
     }
 })(node || (node = {}));
