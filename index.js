@@ -209,6 +209,7 @@ var node;
                         return [4 /*yield*/, mainPage.evaluate("(function() {\n    var canvasList = document.getElementsByTagName('canvas');\n    var maxW = 0, maxH = 0, maxCanvas;\n    for (var i = 0; i < canvasList.length; i++) {\n      var cv = canvasList[i];\n      var rect = cv.getBoundingClientRect();\n      if (rect.width * rect.height > maxW*maxH) {\n        maxW = rect.width;\n        maxH = rect.height;\n        maxCanvas = cv;\n      }\n    }\n    return maxCanvas;\n  })()")];
                     case 4:
                         canvasElem = _b.sent();
+                        console.log('canvas: ', canvasElem);
                         console.log('screenshot...');
                         canvasElem.screenshot({ path: './canvas.png' });
                         return [4 /*yield*/, prompt('exit')];

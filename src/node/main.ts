@@ -65,6 +65,8 @@ namespace node {
     return maxCanvas;
   })()`);
     
+    console.log('canvas: ', canvasElem);
+
     console.log('screenshot...');
     canvasElem.screenshot({ path: './canvas.png' });
 
