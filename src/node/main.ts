@@ -30,8 +30,10 @@ namespace node {
   }
 
   async function withBrowser(browser: import("puppeteer").Browser, mainPage: import("puppeteer").Page) {
+
     const navigate = (async () => {
       try {
+        console.log('goto...');
         await mainPage.goto('http://maps.google.com/');
       }
       catch (error) {
@@ -42,8 +44,30 @@ namespace node {
     await prompt('Navigate to the place and press ENTER');
 
     const [width, height] = await mainPage.evaluate('[window.innerWidth, window.innerHeight]');
-
     console.log({ width, height });
+
+    console.log('viewport/scale...')
+    await mainPage.setViewport({ width: width * 5, height: height * 5, deviceScaleFactor: 5 });
+
+    console.log('canvas...');
+    const canvasElem: import("puppeteer").ElementHandle = await mainPage.evaluate(`(function() {
+    var canvasList = document.getElementsByTagName('canvas');
+    var maxW = 0, maxH = 0, maxCanvas;
+    for (var i = 0; i < canvasList.length; i++) {
+      var cv = canvasList[i];
+      var rect = cv.getBoundingClientRect();
+      if (rect.width * rect.height > maxW*maxH) {
+        maxW = rect.width;
+        maxH = rect.height;
+        maxCanvas = cv;
+      }
+    }
+    return maxCanvas;
+  })()`);
+    
+    console.log('screenshot...');
+    canvasElem.screenshot({ path: './canvas.png' });
+
     await prompt('exit');
   }
 

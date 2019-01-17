@@ -171,7 +171,7 @@ var node;
     node.main = main;
     function withBrowser(browser, mainPage) {
         return __awaiter(this, void 0, void 0, function () {
-            var navigate, _a, width, height;
+            var navigate, _a, width, height, canvasElem;
             var _this = this;
             return __generator(this, function (_b) {
                 switch (_b.label) {
@@ -182,6 +182,7 @@ var node;
                                 switch (_a.label) {
                                     case 0:
                                         _a.trys.push([0, 2, , 3]);
+                                        console.log('goto...');
                                         return [4 /*yield*/, mainPage.goto('http://maps.google.com/')];
                                     case 1:
                                         _a.sent();
@@ -200,8 +201,18 @@ var node;
                     case 2:
                         _a = _b.sent(), width = _a[0], height = _a[1];
                         console.log({ width: width, height: height });
-                        return [4 /*yield*/, prompt('exit')];
+                        console.log('viewport/scale...');
+                        return [4 /*yield*/, mainPage.setViewport({ width: width * 5, height: height * 5, deviceScaleFactor: 5 })];
                     case 3:
+                        _b.sent();
+                        console.log('canvas...');
+                        return [4 /*yield*/, mainPage.evaluate("(function() {\n    var canvasList = document.getElementsByTagName('canvas');\n    var maxW = 0, maxH = 0, maxCanvas;\n    for (var i = 0; i < canvasList.length; i++) {\n      var cv = canvasList[i];\n      var rect = cv.getBoundingClientRect();\n      if (rect.width * rect.height > maxW*maxH) {\n        maxW = rect.width;\n        maxH = rect.height;\n        maxCanvas = cv;\n      }\n    }\n    return maxCanvas;\n  })()")];
+                    case 4:
+                        canvasElem = _b.sent();
+                        console.log('screenshot...');
+                        canvasElem.screenshot({ path: './canvas.png' });
+                        return [4 /*yield*/, prompt('exit')];
+                    case 5:
                         _b.sent();
                         return [2 /*return*/];
                 }
