@@ -38,28 +38,29 @@ namespace a_first {
               // TODO: check with original promise
             }
           }
-      };
+        };
 
-      const resolve = (value: any) => {
-        if (done)
-          return;
+        const resolve = (value: any) => {
+          if (done)
+            return;
 
-        done = true;
-        success = true;
-        promiseResult = value;
-      };
+          done = true;
+          success = true;
+          promiseResult = value;
+        };
 
-      const reject = (error: any) => {
+        const reject = (error: any) => {
 
-      };
+        };
 
-      try {
-        callback(resolve, reject);
-      }
-      catch (error) {
-        reject(error);
+        try {
+          callback(resolve, reject);
+        }
+        catch (error) {
+          reject(error);
+        }
       }
     }
-  }
 
+  }
 }
