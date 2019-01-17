@@ -44,9 +44,60 @@ var a_first;
 var a_first;
 (function (a_first) {
     function mockPromise() {
-        // TODO: very basic Promise mock - enough for TypeScript async
+        var global = getGlobal();
+        global.Promise = promiseScope.Promise;
     }
     a_first.mockPromise = mockPromise;
+    function getGlobal() {
+        if (typeof this !== 'undefined' && this)
+            return this;
+        else if (typeof global !== 'undefined' && global)
+            return global;
+        else if (typeof window !== 'undefined' && window)
+            return window;
+        else
+            return (new Function('return this')());
+    }
+    var promiseScope;
+    (function (promiseScope) {
+        function Promise(callback) {
+            var done = false;
+            var success = false;
+            var promiseResult = null;
+            var promiseError = null;
+            var thens;
+            var callThens = function () {
+                if (thens) {
+                    for (var _i = 0, thens_1 = thens; _i < thens_1.length; _i++) {
+                        var th = thens_1[_i];
+                        try {
+                            // TODO: fire th.onsuccess or th.onerror
+                        }
+                        catch (error) {
+                            // TODO: check with original promise
+                        }
+                    }
+                }
+                ;
+                var resolve = function (value) {
+                    if (done)
+                        return;
+                    done = true;
+                    success = true;
+                    promiseResult = value;
+                };
+                var reject = function (error) {
+                };
+                try {
+                    callback(resolve, reject);
+                }
+                catch (error) {
+                    reject(error);
+                }
+            };
+        }
+        promiseScope.Promise = Promise;
+    })(promiseScope || (promiseScope = {}));
 })(a_first || (a_first = {}));
 var node;
 (function (node) {
