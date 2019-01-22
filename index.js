@@ -171,7 +171,7 @@ var node;
     node.main = main;
     function withBrowser(browser, mainPage) {
         return __awaiter(this, void 0, void 0, function () {
-            var navigate, _a, width, height, canvasElem;
+            var navigate, _a, width, height, zoom, canvasSelector, canvasElem;
             var _this = this;
             return __generator(this, function (_b) {
                 switch (_b.label) {
@@ -202,18 +202,25 @@ var node;
                         _a = _b.sent(), width = _a[0], height = _a[1];
                         console.log({ width: width, height: height });
                         console.log('viewport/scale...');
-                        return [4 /*yield*/, mainPage.setViewport({ width: width * 5, height: height * 5, deviceScaleFactor: 5 })];
+                        zoom = 2;
+                        return [4 /*yield*/, mainPage.setViewport({ width: width * zoom, height: height * zoom, deviceScaleFactor: zoom })];
                     case 3:
                         _b.sent();
+                        mainPage.waitForNavigation({ waitUntil: 'networkidle2' });
                         console.log('canvas...');
-                        return [4 /*yield*/, mainPage.evaluate("(function() {\n    var canvasList = document.getElementsByTagName('canvas');\n    var maxW = 0, maxH = 0, maxCanvas;\n    for (var i = 0; i < canvasList.length; i++) {\n      var cv = canvasList[i];\n      var rect = cv.getBoundingClientRect();\n      if (rect.width * rect.height > maxW*maxH) {\n        maxW = rect.width;\n        maxH = rect.height;\n        maxCanvas = cv;\n      }\n    }\n    return maxCanvas;\n  })()")];
+                        return [4 /*yield*/, mainPage.evaluate("(function() {\n    var canvasList = document.getElementsByTagName('canvas');\n    var maxW = 0, maxH = 0, maxCanvas;\n    for (var i = 0; i < canvasList.length; i++) {\n      var cv = canvasList[i];\n      var rect = cv.getBoundingClientRect();\n      if (rect.width * rect.height > maxW*maxH) {\n        maxW = rect.width;\n        maxH = rect.height;\n        maxCanvas = cv;\n      }\n    }\n    var path = [];\n    var parent = maxCanvas;\n    while (parent && !/^body$/i.test(parent.tagName)) {\n      path.unshift(parent.tagName+(parent.id ? '#' + parent.id : ''));\n      parent = parent.parentElement;\n    }\n    return path.join(' ');\n  })()")];
                     case 4:
-                        canvasElem = _b.sent();
-                        console.log('canvas: ', canvasElem);
-                        console.log('screenshot...');
-                        canvasElem.screenshot({ path: './canvas.png' });
-                        return [4 /*yield*/, prompt('exit')];
+                        canvasSelector = _b.sent();
+                        console.log('canvas: ', canvasSelector + '...');
+                        return [4 /*yield*/, mainPage.$(canvasSelector)];
                     case 5:
+                        canvasElem = (_b.sent());
+                        console.log('screenshot...');
+                        return [4 /*yield*/, canvasElem.screenshot({ path: './canvas.png' })];
+                    case 6:
+                        _b.sent();
+                        return [4 /*yield*/, prompt('exit')];
+                    case 7:
                         _b.sent();
                         return [2 /*return*/];
                 }

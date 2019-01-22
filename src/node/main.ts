@@ -47,10 +47,13 @@ namespace node {
     console.log({ width, height });
 
     console.log('viewport/scale...')
-    await mainPage.setViewport({ width: width * 5, height: height * 5, deviceScaleFactor: 5 });
+    const zoom = 2;
+    await mainPage.setViewport({ width: width * zoom, height: height * zoom, deviceScaleFactor: zoom });
+
+    mainPage.waitForNavigation({ waitUntil: 'networkidle2'});
 
     console.log('canvas...');
-    const canvasElem: import("puppeteer").ElementHandle = await mainPage.evaluate(`(function() {
+    const canvasSelector: string = await mainPage.evaluate(`(function() {
     var canvasList = document.getElementsByTagName('canvas');
     var maxW = 0, maxH = 0, maxCanvas;
     for (var i = 0; i < canvasList.length; i++) {
@@ -62,13 +65,21 @@ namespace node {
         maxCanvas = cv;
       }
     }
-    return maxCanvas;
+    var path = [];
+    var parent = maxCanvas;
+    while (parent && !/^body$/i.test(parent.tagName)) {
+      path.unshift(parent.tagName+(parent.id ? '#' + parent.id : ''));
+      parent = parent.parentElement;
+    }
+    return path.join(' ');
   })()`);
     
-    console.log('canvas: ', canvasElem);
+    console.log('canvas: ', canvasSelector + '...');
+    const canvasElem = (await mainPage.$(canvasSelector))!;
 
     console.log('screenshot...');
-    canvasElem.screenshot({ path: './canvas.png' });
+    await canvasElem.screenshot({ path: './canvas.png' });
+
 
     await prompt('exit');
   }
@@ -100,7 +111,7 @@ namespace node {
       function unsubscribe() {
         process.stdin.off('data', onData);
         process.stdin.off('error', onError);
-        }
+      }
     });
   }
 }
