@@ -47,10 +47,15 @@ namespace node {
     console.log({ width, height });
 
     console.log('viewport/scale...')
-    const zoom = 2;
-    await mainPage.setViewport({ width: width * zoom, height: height * zoom, deviceScaleFactor: zoom });
-
-    mainPage.waitForNavigation({ waitUntil: 'networkidle2'});
+    const zoom = 3;
+    await mainPage.emulate({
+      viewport: {
+        width: width * zoom,
+        height: height * zoom,
+        deviceScaleFactor: zoom,
+        isMobile: true
+      }
+    });
 
     console.log('canvas...');
     const canvasSelector: string = await mainPage.evaluate(`(function() {
@@ -68,6 +73,7 @@ namespace node {
     var path = [];
     var parent = maxCanvas;
     while (parent && !/^body$/i.test(parent.tagName)) {
+      parent.style.zIndex = 1000 - path.length;
       path.unshift(parent.tagName+(parent.id ? '#' + parent.id : ''));
       parent = parent.parentElement;
     }
@@ -76,6 +82,9 @@ namespace node {
     
     console.log('canvas: ', canvasSelector + '...');
     const canvasElem = (await mainPage.$(canvasSelector))!;
+
+    await prompt('Wait for all ready...');
+
 
     console.log('screenshot...');
     await canvasElem.screenshot({ path: './canvas.png' });
